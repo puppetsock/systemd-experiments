@@ -1,0 +1,8 @@
+ARG SQUASHFS_TOOLS_BASE_IMAGE=mcr.microsoft.com/cbl-mariner/base/core:2.0
+
+# Base image for building squashfs-tools
+FROM ${SQUASHFS_TOOLS_BASE_IMAGE} AS squashfs-tools
+RUN tdnf distro-sync -y && \
+    tdnf install -y squashfs-tools && \
+    tdnf autoremove && \
+    tdnf clean all
