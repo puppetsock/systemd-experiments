@@ -1,5 +1,5 @@
 #FROM azurelinuxpreview.azurecr.io/public/azurelinux/base/core:3.0
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
+FROM docker.io/library/ubuntu:24.04
 
 SHELL [ "/usr/bin/bash", "-cex" ]
 
@@ -9,17 +9,16 @@ STOPSIGNAL SIGRTMIN+3
 
 VOLUME [ "/tmp", "/run", "/run/lock" ]
 
-RUN tdnf distro-sync -y; \
-    tdnf install -y \
+RUN apt-get update -y; \
+    apt-get install -y \
         ca-certificates \
         dbus \
-        iproute \
+        iproute2 \
         procps \
         systemd \
         util-linux \
-        vim; \
-    tdnf autoremove; \
-    tdnf clean all
+        vim \
+        kmod
 
 RUN find /lib/systemd/system/sysinit.target.wants/ -name "systemd-tmpfiles-setup.service" -delete; \
     rm -f /lib/systemd/system/multi-user.target.wants/*; \

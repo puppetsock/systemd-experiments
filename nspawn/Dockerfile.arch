@@ -1,0 +1,6 @@
+FROM archlinux:latest AS builder
+RUN pacman -Syu --noconfirm arch-install-scripts
+# RUN pacstrap -K -c /chroot base
+# # Final image from scratch
+# FROM scratch AS final
+# COPY --from=builder /chroot /

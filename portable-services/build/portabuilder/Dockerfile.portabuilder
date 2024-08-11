@@ -1,24 +1,21 @@
 # Arguments for each base image
-ARG SQUASHFS_TOOLS_IMAGE=mcr.microsoft.com/cbl-mariner/base/core:2.0
+ARG SQUASHFS_TOOLS_IMAGE=localhost/portabuilder-squashfs-tools:latest
 ARG TARGET_IMAGE=mcr.microsoft.com/cbl-mariner/base/core:2.0
 
 # Base image for building squashfs-tools
 FROM ${SQUASHFS_TOOLS_IMAGE} AS squashfs-tools
-RUN tdnf distro-sync -y && \
-    tdnf install -y squashfs-tools && \
-    tdnf autoremove && \
-    tdnf clean all
 
 # Main target image
 FROM ${TARGET_IMAGE} AS target
 
 # Prepare the filesystem for squashfs
 FROM squashfs-tools AS squashfs-builder
+ARG TARGET_SERVICE=foo
 COPY --from=target / /rootfs
-RUN mkdir -p /rootfs/{proc,sys,dev,run,tmp,var/tmp,etc} && \
+RUN mkdir -p /rootfs/{proc,sys,dev,run,tmp,var/tmp,etc} ;\
     touch /rootfs/etc/{resolv.conf,machine-id}
 WORKDIR /out
-RUN mksquashfs /rootfs httpd.raw
+RUN mksquashfs /rootfs ${TARGET_SERVICE}.raw
 
 # Final image from scratch
 FROM scratch AS final-squashfs

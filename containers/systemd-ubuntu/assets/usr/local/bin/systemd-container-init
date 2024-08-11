@@ -1,0 +1,8 @@
+#!/bin/bash
+set -eufo pipefail
+
+# Export all environment variables to a file for container use
+env > /etc/container-environment
+
+# Execute the systemd init system
+exec /lib/systemd/systemd

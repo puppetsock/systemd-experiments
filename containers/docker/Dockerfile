@@ -1,6 +1,7 @@
 FROM soulard.port.direct/systemd-container:latest
 
 RUN tdnf install -y \
+        git \
         moby-containerd \
         moby-cli \
         moby-engine ;\
@@ -11,8 +12,13 @@ RUN tdnf install -y \
     systemctl enable docker.service ;\
     systemctl disable auditd.service iptables.service
 
+COPY ./assets /tmp/assets
+
+RUN cp -rfv /tmp/assets/* /; \
+    rm -rf /tmp/assets; 
+
 VOLUME ["/var/lib/docker","/var/lib/containerd"]
 
 # Health check to verify Docker daemon is running
-HEALTHCHECK --interval=1s --timeout=30s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=10s --timeout=30s --start-period=30s --retries=3 \
     CMD docker info || exit 1
