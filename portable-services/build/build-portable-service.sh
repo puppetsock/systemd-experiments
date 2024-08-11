@@ -7,6 +7,9 @@ cd "${script_repo_dir}"
 echo "Running: ${script_dir}/${script_name} from ${script_repo_dir} as $(whoami) user"
 set -x
 
+type="$1"
+portabuilder_volume_out="$2"
+portable_service_name="$3"
 
 docker volume create --driver=local "${portabuilder_volume_out}"
 
@@ -24,6 +27,8 @@ function destroy_portabuilder_host_container(){
         docker volume rm ${associated_volumes}
     fi
 }
+
+#destroy_portabuilder_host_container "${portabuilder_host_container_name}"
 
 function ensure_portabuilder_host_container(){
     local portabuilder_host_container_name="${1}"
@@ -78,11 +83,10 @@ docker exec "${portabuilder_host_container_name}" \
             --tag "${registry}/${portabuilder_squashfs_tools_image}:latest" .; \
         popd"
 
-portable_service_name="$1"
 portable_service_image_prefix="portable-service"
 portable_service_image="${portable_service_image_prefix}-${portable_service_name}"
 docker exec "${portabuilder_host_container_name}" \
-    bash -cex "pushd ./portable-services/services/${portable_service_name}; \
+    bash -cex "pushd ./portable-services/${type}/${portable_service_name}; \
         docker buildx build \
             --file ./Dockerfile \
             --tag "${registry}/${portable_service_image}:latest" .; \
@@ -98,5 +102,5 @@ docker exec "${portabuilder_host_container_name}" \
             --build-arg TARGET_IMAGE="${registry}/${portable_service_image}:latest" \
             --build-arg TARGET_SERVICE="${portable_service_name}" \
             --target final-squashfs \
-            --output type=local,dest=/opt/portable-services/ .; \
+            --output type=local,dest=/opt/portable-services/${type} .; \
         popd"

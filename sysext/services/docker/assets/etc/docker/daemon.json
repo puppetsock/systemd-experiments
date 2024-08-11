@@ -1,6 +1,0 @@
-{
-    "log-level": "debug",
-    "features": { "buildkit": true , "containerd-snapshotter": true},
-    "experimental": true,
-    "cgroup-parent": "docker.slice"
-}

@@ -1,5 +1,14 @@
 #!/bin/bash
-set -ex
+set -euf -o pipefail -o errexit -o nounset
+script_dir="$(dirname -- "${BASH_SOURCE[0]}")"
+script_name="$(basename "${BASH_SOURCE[0]}")"
+script_repo_dir="$(git rev-parse --show-toplevel)"
+cd "${script_repo_dir}"
+echo "Running: ${script_dir}/${script_name} from ${script_repo_dir} as $(whoami) user"
+set -x
+
+cd ${script_dir}
+
 nspawn_container_name="mini-mariner"
 nspawn_container_dir="/var/lib/puppet-sock/nspawn"
 
@@ -19,12 +28,12 @@ for interface in $(ip -j route show default | jq -r '.[].dev'); do
 done
 
 portable_services_location="$(docker volume inspect --format '{{ .Mountpoint }}' portabuilder-out)"
-#sudo systemd-run --unit="${nspawn_container_name}" \
+sudo systemd-run --unit="${nspawn_container_name}" \
     sudo systemd-nspawn \
         --machine="${nspawn_container_name}" \
         --bind-ro="${portable_services_location}:/opt/portable-services/" \
         --bind="/dev/kmsg:/dev/kmsg" \
-        --system-call-filter='add_key bpf keyctl @mount @privileged' \
+        --system-call-filter='add_key bpf keyctl' \
         --network-veth \
         -b \
         -D "${nspawn_container_dir}"

@@ -1,0 +1,19 @@
+[Unit]
+Description=Nginx High-performance HTTP server and reverse proxy
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+ConfigurationDirectory=nginx
+LogsDirectory=nginx
+PIDFile=/var/run/nginx.pid
+#ExecStartPre=/bin/sh -cex '[ "$(find /etc/nginx -mindepth 1 -print -quit)" ] || tar -xzvf /opt/nginx_config.tar.gz -C /etc/nginx --strip-components=2'
+ExecStartPre=/usr/sbin/nginx -t
+ExecStart=/usr/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
