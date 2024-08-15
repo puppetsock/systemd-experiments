@@ -10,6 +10,13 @@ RUN tdnf distro-sync -y && \
     tdnf clean all
 
 FROM scratch AS target
+
+COPY ./assets/usr/lib/extension-release.d/extension-release.containerd /usr/lib/extension-release.d/extension-release.containerd
+COPY ./assets/usr/lib/systemd/system/containerd.service /usr/lib/systemd/system/containerd.service
 COPY --from=package-target /usr/bin/crictl /usr/bin/crictl
 COPY --from=package-target /usr/bin/ctr /usr/bin/ctr
-COPY ./assets/usr/lib/extension-release.d/extension-release.containerd /usr/lib/extension-release.d/extension-release.containerd
+COPY --from=package-target /usr/bin/runc /usr/bin/runc
+COPY --from=package-target /usr/bin/containerd /usr/bin/containerd
+COPY --from=package-target /usr/bin/containerd-shim /usr/bin/containerd-shim
+COPY --from=package-target /usr/bin/containerd-shim-runc-v1 /usr/bin/containerd-shim-runc-v1
+COPY --from=package-target /usr/bin/containerd-shim-runc-v2 /usr/bin/containerd-shim-runc-v2

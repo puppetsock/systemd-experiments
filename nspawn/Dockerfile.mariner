@@ -8,12 +8,19 @@ RUN tdnf distro-sync -y; \
     tdnf clean all
 
 FROM builder AS build
-RUN dnf --installroot=/chroot --releasever=2.0 install -y mariner-release systemd filesystem dbus bash busybox util-linux squashfs-tools passwd
-RUN dnf --installroot=/chroot --releasever=2.0 install -y tdnf rpm bzip2 ca-certificates ca-certificates-base ca-certificates-shared ca-certificates-tools
-RUN dnf --installroot=/chroot --releasever=2.0 install -y moby-cli cri-tools
+RUN dnf --installroot=/chroot --releasever=2.0 install -y mariner-release systemd filesystem dbus bash busybox util-linux squashfs-tools passwd procps-ng
 
-#azurelinux-repos azurelinux-repos-ms-non-oss azurelinux-repos-ms-oss curl ca-certificates  tdnf tdnf-plugin-repogpgcheck bash systemd-container
-#for cmd in $(busybox --list); do [ -z "$(command -v "${cmd}")" ] && ln -s "$(command -v busybox)" "/usr/bin/${cmd}"; done
+RUN pushd /chroot/usr/bin ;\
+        export PATH=$(echo $PATH | sed 's|[^:]*|/chroot&|g') ;\
+        for cmd in $(busybox --list); do [ -z "$(command -v "${cmd}")" ] && ln -s "$(realpath --relative-to="$(pwd)" "$(command -v busybox)")" "./${cmd}"; done ;\
+    popd
+
+RUN dnf --installroot=/chroot --releasever=2.0 install -y ca-certificates
+RUN cp -rfva /etc/ssl /chroot/etc/
+# Copy assets
+COPY ./assets /tmp/assets
+RUN cp -rfv /tmp/assets/* /chroot/ && \
+    rm -rf /tmp/assets
 
 RUN chmod 755 /chroot
 RUN chmod 2755 /chroot/var/log/journal

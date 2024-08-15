@@ -34,6 +34,7 @@ sudo systemd-run --unit="${nspawn_container_name}" \
         --bind-ro="${portable_services_location}:/opt/portable-services/" \
         --bind="/dev/kmsg:/dev/kmsg" \
         --system-call-filter='add_key bpf keyctl' \
+        --capability=all \
         --network-veth \
         -b \
         -D "${nspawn_container_dir}"

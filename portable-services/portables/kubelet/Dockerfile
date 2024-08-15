@@ -13,7 +13,7 @@ FROM ${TARGET_IMAGE} AS target
 COPY --from=package-target /usr/bin/kubelet /usr/bin/kubelet
 COPY --from=package-target /usr/bin/kubeadm /usr/bin/kubeadm
 RUN tdnf distro-sync -y && \
-    tdnf install -y util-linux && \
+    tdnf install -y util-linux moby-containerd cri-tools ca-certificates cni;\&& \
     tdnf autoremove && \
     tdnf clean all
 

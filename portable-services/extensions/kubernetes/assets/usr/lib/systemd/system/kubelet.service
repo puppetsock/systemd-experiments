@@ -1,30 +1,9 @@
 [Unit]
 Description=kubelet: The Kubernetes Node Agent
 Documentation=https://kubernetes.io/docs/
-Requires=kubelet-containerd.service
-JoinsNamespaceOf=kubelet-containerd.service
+Requires=containerd.service
 
 [Service]
-RuntimeDirectory=kubelet
-StateDirectory=kubelet
-#ConfigurationDirectory=kubernetes
-BindPaths=/run/containerd/:/run/containerd/:rbind
-BindPaths=/var/lib/kubelet/:/var/lib/kubelet/:rbind
-BindPaths=/var/lib/containerd/:/var/lib/containerd/:rbind
-BindPaths=/var/log/:/var/log/:rbind
-BindPaths=/etc/kubernetes/:/etc/kubernetes/:rbind
-
-BindPaths=/opt/cni:/opt/cni
-BindPaths=/etc/cni:/etc/cni
-
-MountFlags=shared
-PrivateMounts=no
-PrivateTmp=yes
-
-#BindPaths=/etc/ssl/certs/
-
-LogsDirectory=pods containers
-
 Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
 Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"
 # This is a file that "kubeadm init" and "kubeadm join" generates at runtime, populating the KUBELET_KUBEADM_ARGS variable dynamically
@@ -33,8 +12,7 @@ EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env
 # the .NodeRegistration.KubeletExtraArgs object in the configuration files instead. KUBELET_EXTRA_ARGS should be sourced from this file.
 EnvironmentFile=-/etc/sysconfig/kubelet
 
-#ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
-ExecStart=/usr/local/bin/kubelet
+ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
 Restart=always
 StartLimitInterval=0
 RestartSec=10

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -ex
+exec nsenter -t "$(nsenter -t 1 --all systemctl show kubelet-containerd --property=MainPID | cut -d'=' -f2)" --no-fork --all /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9
